@@ -8,13 +8,13 @@ const API_URL = 'https://desarrollojotaa.cl/api-products/api'
 
 
 const App = () => {
-  
+  // Declare state variables
   const [products, setProduct] = useState([]);
   const [searchBy, setSearchBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   
   
-
+  // Fetch list of products
   const listProducst = async (pageNumber) => {
     const response = await fetch(`${API_URL}/products?page=${pageNumber}`);
     const data = await response.json();
@@ -23,6 +23,7 @@ const App = () => {
     //console.log(data.products);
   }
 
+  // Search for products by name or description
   const searchProducts = async (nameP, pageNumber) => {
     const response = await fetch(`${API_URL}/products/search/${nameP}?page=${pageNumber}`);
     const data = await response.json();
@@ -30,20 +31,22 @@ const App = () => {
     setProduct(data.products.data)
   }
 
+  // Search for a product by its Id
   const searchProductsId = async (id) => {
     const response = await fetch(`${API_URL}/product/${id}`);
     const data = await response.json();
-
+    //console.log(data.product);
     setProduct(data.product);
     
   }
 
   useEffect(() => {
     listProducst(currentPage);
+    //searchProductsId(27);
     
   }, []);
   //console.log(currentPage);
-
+  //console.log(typeof Number(searchBy));
   return (
     <div className="app">
       <h1 onClick={(e) => {setSearchBy(''); listProducst(1);} } >Jotaa products</h1>
@@ -52,17 +55,25 @@ const App = () => {
 
       <div className="search">
         <input
-          placeholder='Search product by name or description'
+          placeholder='Search product by name, description or Id'
           
           value={searchBy}
           onChange={(e) => setSearchBy(e.target.value)}
         />
+
         <img 
           src={SearchIcon}
           alt="search"
-          onClick={ (e) => {searchProducts(searchBy, currentPage); }}
-          //onClick={searchBy !== Number ? () => searchProducts(searchBy) : () => searchProductsId(Number(searchBy))}
-        />
+          onClick={ (e) => {
+            if (Number.isInteger(Number(searchBy))) {
+            searchProductsId(searchBy);
+            } else {
+            searchProducts(searchBy, currentPage);
+            }
+          }}
+        />    
+
+    
       </div>
 
       {
@@ -84,22 +95,36 @@ const App = () => {
 
       }
 
-      {
-        products?.length > 0
-          ? (
-            <div className='container'>
+   
 
-              {products?.map((product) => (
-                <ProductCard product={product} key={product.id} />
-              ))}
+      {
+        (Number(searchBy) <0 || Number(searchBy) > 250) ? (
+          <div className='empty'>
+            <h2>No product found</h2>
+          </div> 
+        ) : products?.length > 0 ? (
+          <div className='container'>
+            {products?.map((product) => (
+              <ProductCard product={product} key={product.id} />
+            ))}
+          </div>
+        ) : (
+          !products.name ? 
+
+          <div className='empty'>
+            <h2>No product found</h2>
+          </div> :
+
+          products.name && <ProductCard product={products} key={products.id} />
+        )
+      }
       
-            </div>
-          ) : (
-            <div className='empty'>
-              <h2>No product found</h2>
-            </div>
-          )
-      } 
+
+    
+
+     
+          
+        
      </div>
   );
 }
