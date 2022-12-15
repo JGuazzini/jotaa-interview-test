@@ -1,7 +1,7 @@
 # jotaa-interview-test
 
-
-
+Deployed web link https://jotaa-products-website.netlify.app/
+ 
 Este código es una aplicación web simple desarrollada con React. La aplicación consta de un componente principal llamado App, que se encarga de renderizar la interfaz de usuario y llevar a cabo la lógica de negocio.
 
 La aplicación permite a los usuarios buscar productos en una base de datos de productos utilizando una barra de búsqueda. Cuando el usuario busca un producto, se llama a una función llamada searchProducts que realiza una solicitud HTTP a una URL especificada en la constante API_URL utilizando el término de búsqueda y la página actual. La función luego actualiza el estado de la aplicación con los resultados de la búsqueda.
