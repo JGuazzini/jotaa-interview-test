@@ -2,32 +2,32 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 import SearchIcon from './search.svg'
-import ProductCard from './components/productCard';
+import ProductCard from './components/ProductCard';
 
 const API_URL = 'https://desarrollojotaa.cl/api-products/api'
 
 
-
-
-
 const App = () => {
-
+  
   const [products, setProduct] = useState([]);
   const [searchBy, setSearchBy] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  
   
 
-  const listProducst = async () => {
-    const response = await fetch(`${API_URL}/products`);
+  const listProducst = async (pageNumber) => {
+    const response = await fetch(`${API_URL}/products?page=${pageNumber}`);
     const data = await response.json();
-
-    setProduct(data.products)
+    setCurrentPage(pageNumber);
+    setProduct(data.products.data);
+    //console.log(data.products);
   }
 
-  const searchProducts = async (nameP) => {
-    const response = await fetch(`${API_URL}/products/search/${nameP}`);
+  const searchProducts = async (nameP, pageNumber) => {
+    const response = await fetch(`${API_URL}/products/search/${nameP}?page=${pageNumber}`);
     const data = await response.json();
-    
-    setProduct(data.products)
+    setCurrentPage(pageNumber);
+    setProduct(data.products.data)
   }
 
   const searchProductsId = async (id) => {
@@ -39,15 +39,15 @@ const App = () => {
   }
 
   useEffect(() => {
-    listProducst();
-    
-    
+    listProducst(currentPage);
     
   }, []);
+  //console.log(currentPage);
 
   return (
     <div className="app">
-      <h1 onClick={(e) => {setSearchBy(''); listProducst();} } >Jotaa products</h1>
+      <h1 onClick={(e) => {setSearchBy(''); listProducst(1);} } >Jotaa products</h1>
+      
       
 
       <div className="search">
@@ -60,17 +60,36 @@ const App = () => {
         <img 
           src={SearchIcon}
           alt="search"
-          onClick={ () => {searchProductsId(searchBy); searchProducts(searchBy); }}
+          onClick={ (e) => {searchProducts(searchBy, currentPage); }}
           //onClick={searchBy !== Number ? () => searchProducts(searchBy) : () => searchProductsId(Number(searchBy))}
         />
       </div>
+
+      {
+        searchBy?.length > 0 ? (
+          <div className='p'>
+            <button className='pagination' onClick={() => {currentPage <1 ? setCurrentPage(1) : searchProducts(searchBy, currentPage-1)}}>Previous page</button>;
+            <button className='pagination' onClick={(e) => {searchProducts(searchBy, currentPage+1)}}>Next  Page</button>;
+          </div>
+
+        ) : (
+          <div className='p'>
+            <button className='pagination' onClick={() => {currentPage <1 ? setCurrentPage(1) : listProducst(currentPage-1)}}>Previous page</button>;
+            <button className='pagination' onClick={(e) => {listProducst(currentPage+1)}}>Next  Page</button>;
+          </div>
+
+        )
+        
+        
+
+      }
 
       {
         products?.length > 0
           ? (
             <div className='container'>
 
-              {products.map((product) => (
+              {products?.map((product) => (
                 <ProductCard product={product} key={product.id} />
               ))}
       
